@@ -1,0 +1,20 @@
+{
+  "title": "Create User Management System",
+  "description": "Implement a complete user management system with CRUD operations for Ruby on Rails. The system should include user authentication, role-based permissions, and an admin dashboard.",
+  "acceptance_criteria": [
+    "Create User model with validations for email uniqueness and password strength",
+    "Implement authentication with Devise gem",
+    "Create UsersController with full CRUD actions",
+    "Add role-based authorization using Pundit",
+    "Build admin dashboard to manage users",
+    "Add API endpoints for mobile app integration",
+    "Include proper error handling and flash messages",
+    "Add database indexes for performance",
+    "Write RSpec tests for all functionality"
+  ],
+  "priority": "High",
+  "story_points": 13,
+  "labels": ["Ruby on Rails", "Backend", "Authentication"],
+  "assignee": "Backend Team",
+  "dependencies": ["Devise gem", "Pundit gem", "RSpec"]
+}

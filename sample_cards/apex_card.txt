@@ -1,0 +1,12 @@
+Create Salesforce Opportunity Trigger
+
+Implement an Apex trigger for the Opportunity object that automatically:
+- Updates the opportunity owner's manager when opportunity amount exceeds $100,000
+- Creates follow-up tasks for high-value opportunities
+- Prevents deletion of opportunities with closed won status
+- Logs all changes to a custom audit object
+
+Priority: Critical
+Story Points: 5
+Assignee: Salesforce Developer
+Labels: Apex, Trigger, Automation

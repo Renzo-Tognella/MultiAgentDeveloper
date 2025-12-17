@@ -1,109 +1,141 @@
+# MultiAgent Developer
 
-# Devyan
-## Overview
+Sistema de processamento de cards de backlog usando múltiplos agentes de IA especializados.
 
-**Devyan** is an AI-powered software development assistant that orchestrates a team of agents to solve programming tasks. It uses OpenAI's GPT-based agents to perform various roles such as architecture design, implementation, testing, and reviewing.
+## Arquitetura
 
+Projeto estruturado seguindo **Clean Architecture** e **Clean Code**:
 
-![Video Description](gif.gif)
-## Features
-
-- **Architect Agent**: Designs the architecture of the solution based on the user input.
-- **Programmer Agent**: Implements the solution as per the architecture design.
-- **Tester Agent**: Tests the implemented solution to ensure it meets the requirements and is free of bugs.
-- **Reviewer Agent**: Reviews the architecture, implementation, and test results to provide a comprehensive analysis.
-![img](architecture.png)
-
-
-## Requirements
-
-- Python 3.7+
-- `requests` library
-- `langchain` library
-- `python-decouple` library
-- `crewai` library
-- OpenAI API Key
-
-## Installation
-
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/your-username/devain.git
-    cd devain
-    ```
-
-2. Create a virtual environment:
-    ```sh
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
-
-3. Install the dependencies:
-    ```sh
-    pip install -r requirements.txt
-    ```
-
-4. Set up environment variables:
-    Create a `.env` file in the root directory of the project and add your OpenAI API key:
-    ```env
-    OPENAI_API_KEY=your_openai_api_key_here
-    SERPER_API_KEY=your_serper_api_key_here
-    ```
-
-## Usage
-
-1. Run the main script:
-    ```sh
-    python main.py
-    ```
-
-2. Follow the prompts:
-    ```text
-    ## Welcome to Devain##
-    -------------------------------
-    What problem do you want us to solve?
-    ```
-
-3. Enter the problem you want Devain to solve, and let the agents handle the rest.
-
-## Project Structure
-
-```plaintext
-devain/
-│
-│ 
-├── tools/
-│   ├── __init__.py
-│   ├── file_write.py
-│   └── directory_write.py
-│
-├── agents.py
-│
-├── tasks.py
-│
-├── main.py
-│
+```
+MultiAgentDeveloper/
+├── main.py                     # Entry point
 ├── requirements.txt
 │
-└── README.md
+├── core/                       # Domínio e orquestração
+│   ├── config.py              # Configuração centralizada
+│   ├── entities.py            # Entidades de domínio
+│   ├── exceptions.py          # Exceções customizadas
+│   ├── parsers.py             # Parsers (Strategy pattern)
+│   ├── slack.py               # Integração Slack (Human-in-the-loop)
+│   └── orchestrator.py        # Orquestrador (DI + Factory)
+│
+├── frameworks/                 # Agentes por tecnologia
+│   ├── base.py                # Classes abstratas (DRY)
+│   ├── react/                 # React JS
+│   ├── rails/                 # Ruby on Rails
+│   ├── apex/                  # Salesforce Apex
+│   └── frontend/              # HTML/CSS/JS
+│
+├── tools/                      # Ferramentas dos agentes
+│   ├── analyzer.py            # Análise de codebase
+│   ├── filesystem.py          # Operações de arquivo
+│   └── human_input.py         # Ferramenta de input do usuário
+│
+└── sample_cards/               # Exemplos de cards
 ```
 
-## Contributing
+## Princípios Aplicados
 
-1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/your-feature`).
-3. Commit your changes (`git commit -m 'Add some feature'`).
-4. Push to the branch (`git push origin feature/your-feature``).
-5. Open a pull request.
+- **Single Responsibility**: Cada classe tem uma responsabilidade
+- **Open/Closed**: Extensível para novos frameworks sem modificar código existente
+- **Dependency Inversion**: Injeção de dependências no orchestrator
+- **Strategy Pattern**: Parsers intercambiáveis para diferentes formatos
+- **Factory Pattern**: Criação de crews especializados
+- **Template Method**: Classes base para agents e tasks
 
-## Todo
-- [x] Create Custom tool to write file
-- [x] Create Custom tool to create directory
-- [x] Change prompts in tasks, make it more detialed and clear
-- [ ] Use pytoml
-- [ ] Add Agent Logs
-- [ ] Stackoverflow tool
-- [ ] Code Execution
+## Requisitos
 
+- Python 3.10+ (recomendado 3.11)
+- OpenAI API Key
 
-[![Star History Chart](https://api.star-history.com/svg?repos=theyashwanthsai/Devyan&type=Date)](https://star-history.com/#theyashwanthsai/Devyan&Date)
+## Instalação
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Configuração
+
+Crie um arquivo `.env`:
+
+```env
+# OpenAI (obrigatório)
+OPENAI_API_KEY=sua_chave
+
+# Slack (opcional - human-in-the-loop)
+SLACK_ENABLED=true
+SLACK_BOT_TOKEN=xoxb-seu-token
+SLACK_CHANNEL=C0123456789
+SLACK_POLL_INTERVAL=5
+SLACK_TIMEOUT=300
+
+# Geral
+LOG_LEVEL=INFO
+VERBOSE_AGENTS=false
+```
+
+## Integração Slack (Human-in-the-loop)
+
+Os agentes podem fazer perguntas ao usuário durante o desenvolvimento via Slack.
+
+### Como Funciona
+
+1. Agente identifica que precisa de clarificação
+2. Usa a ferramenta `Ask User Question` para enviar pergunta ao Slack
+3. Sistema aguarda resposta do usuário (com timeout configurável)
+4. Resposta é retornada ao agente que continua o trabalho
+
+### Configuração do Slack Bot
+
+1. Acesse [api.slack.com/apps](https://api.slack.com/apps)
+2. Crie um novo app e adicione ao workspace
+3. Em **OAuth & Permissions**, adicione os scopes:
+   - `chat:write`
+   - `channels:history`
+   - `groups:history`
+4. Instale o app e copie o **Bot User OAuth Token**
+5. Adicione o bot ao canal desejado
+
+### Modo Console (sem Slack)
+
+Se `SLACK_ENABLED=false` ou não configurado, o sistema usa input via console:
+
+```
+❓ Agent Question: Qual banco de dados você prefere?
+📝 Your answer: PostgreSQL
+```
+
+## Uso
+
+```bash
+python main.py
+```
+
+O sistema aceita cards em formato JSON, Markdown ou texto plano.
+
+## Frameworks Suportados
+
+| Framework | Tecnologias |
+|-----------|-------------|
+| React | JSX, Hooks, Context API |
+| Rails | Ruby, Active Record, RSpec |
+| Apex | Salesforce, SOQL, LWC |
+| Frontend | HTML5, CSS3, ES6+ |
+
+## Estrutura de um Card
+
+```markdown
+# Título da Feature
+
+## Description
+Descrição detalhada...
+
+## Acceptance Criteria
+- Critério 1
+- Critério 2
+
+Priority: High
+Story Points: 5
+```
